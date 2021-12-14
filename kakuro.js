@@ -139,8 +139,10 @@ const main = () => {
   for (const constraint of downConstraints) {
     csp.addConstraint(constraint)
   }
-  const solution = csp.backtrackingSearch()
+  let steps = 0
+  const solution = csp.backtrackingSearch(_assignment => { steps++ })
   console.dir(solution)
+  console.log('steps:', steps.toLocaleString())
 }
 
 main()

@@ -41,7 +41,7 @@ class CSP {
     return true
   }
 
-  backtrackingSearch(assignment = new Map()) {
+  backtrackingSearch(cb, assignment = new Map()) {
 
     if (assignment.size === this.variables.length) {
       return assignment
@@ -52,8 +52,9 @@ class CSP {
     for (const value of this.domains.get(first)) {
       const localAssignment = new Map(assignment)
       localAssignment.set(first, value)
+      cb?.(localAssignment)
       if (this.consistent(first, localAssignment)) {
-        const result = this.backtrackingSearch(localAssignment)
+        const result = this.backtrackingSearch(cb, localAssignment)
         if (result) {
           return result
         }
