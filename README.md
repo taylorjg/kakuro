@@ -1,18 +1,18 @@
 # Description
 
-A solver for Kakuro puzzles.
+Develop a solver for Kakuro puzzles.
 
 # TODO
 
-* Extract the sample puzzle into a JSON file
-  * Is there a common format for this ?
-    * https://github.com/maksverver/kakuro/blob/master/Grid%20Encoding.txt
-    * https://github.com/adi7em/Kakuro-Solver/tree/master/inputFiles
-    * https://cspsat.gitlab.io/copris-puzzles/kakuro/
-* Add a callback (for visualisation purposes)
+* ~~Extract the sample puzzle into a JSON file~~
+* Is there a common file format for Kakuro puzzles?
+  * https://github.com/maksverver/kakuro/blob/master/Grid%20Encoding.txt
+  * https://github.com/adi7em/Kakuro-Solver/tree/master/inputFiles
+  * https://cspsat.gitlab.io/copris-puzzles/kakuro/
+* ~~Add support for an optional callback to be invoked at each step~~
 * Convert to TypeScript
 * Visualise the solving process in a React app
-* Develop ability to scan in a Kakuro puzzle
+* Develop ability to scan in a Kakuro puzzle and show the solution
 
 # Sample Puzzles
 

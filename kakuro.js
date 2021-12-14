@@ -1,4 +1,5 @@
 const { Constraint, CSP } = require('./csp')
+const SAMPLE_PUZZLE = require('./The-Daily-Telegraph-4203.json')
 
 const sum = xs => xs.reduce((a, b) => a + b, 0)
 
@@ -32,101 +33,41 @@ class KakuroConstraint extends Constraint {
   }
 }
 
-// No 4203
-const GRID_SHAPE = [
-  'XXXXXXXXXX',
-  'XX..X..X..',
-  'X...X.....',
-  'X....X...X',
-  'X..X....XX',
-  'X..X...X..',
-  'XXX....X..',
-  'XX...X....',
-  'X.....X...',
-  'X..X..X..X',
-]
-
-// [row, col, sum]
-const ACROSS_CLUES = [
-  [1, 1, 16],
-  [1, 4, 9],
-  [1, 7, 16],
-  [2, 0, 7],
-  [2, 4, 35],
-  [3, 0, 29],
-  [3, 5, 24],
-  [4, 0, 3],
-  [4, 3, 21],
-  [5, 0, 4],
-  [5, 3, 17],
-  [5, 7, 7],
-  [6, 2, 11],
-  [6, 7, 17],
-  [7, 1, 21],
-  [7, 5, 12],
-  [8, 0, 25],
-  [8, 6, 9],
-  [9, 0, 4],
-  [9, 3, 4],
-  [9, 6, 4]
-]
-
-// [row, col, sum]
-const DOWN_CLUES = [
-  [0, 2, 19],
-  [0, 3, 18],
-  [0, 5, 14],
-  [0, 6, 35],
-  [0, 8, 22],
-  [0, 9, 17],
-  [1, 1, 15],
-  [1, 7, 24],
-  [2, 4, 31],
-  [3, 5, 11],
-  [4, 8, 26],
-  [4, 9, 16],
-  [5, 3, 9],
-  [6, 2, 17],
-  [6, 7, 6],
-  [7, 1, 7],
-  [7, 5, 8]
-]
-
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-const isEmptySquare = (row, col) => (
-  row >= 0 && row < 10 &&
-  col >= 0 && col < 10 &&
-  GRID_SHAPE[row][col] === '.'
+const isEmptySquare = (puzzle, row, col) => (
+  row >= 0 && row < puzzle.gridShape.length &&
+  col >= 0 && col < puzzle.gridShape[0].length &&
+  puzzle.gridShape[row][col] === '.'
 )
 
-const findAcrossRuns = () => {
-  return ACROSS_CLUES.map(([row, col, sum]) => {
+const findAcrossRuns = puzzle => {
+  return puzzle.acrossClues.map(([row, col, sum]) => {
     const variables = []
     for (; ;) {
       col += 1
-      if (!isEmptySquare(row, col)) break
+      if (!isEmptySquare(puzzle, row, col)) break
       variables.push(makeVariable(row, col))
     }
     return { variables, sum }
   })
 }
 
-const findDownRuns = () => {
-  return DOWN_CLUES.map(([row, col, sum]) => {
+const findDownRuns = puzzle => {
+  return puzzle.downClues.map(([row, col, sum]) => {
     const variables = []
     for (; ;) {
       row += 1
-      if (!isEmptySquare(row, col)) break
+      if (!isEmptySquare(puzzle, row, col)) break
       variables.push(makeVariable(row, col))
     }
     return { variables, sum }
   })
 }
 
-const main = () => {
-  const acrossRuns = findAcrossRuns()
-  const downRuns = findDownRuns()
+const main = puzzle => {
+  const acrossRuns = findAcrossRuns(puzzle)
+  const downRuns = findDownRuns(puzzle)
   const allRuns = [].concat(acrossRuns, downRuns)
   const variables = Array.from(new Set(allRuns.flatMap(({ variables }) => variables)))
   const domains = new Map(variables.map(variable => [variable, DIGITS]))
@@ -145,4 +86,4 @@ const main = () => {
   console.log('steps:', steps.toLocaleString())
 }
 
-main()
+main(SAMPLE_PUZZLE)
