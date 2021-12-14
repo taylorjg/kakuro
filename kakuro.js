@@ -94,20 +94,41 @@ const DOWN_CLUES = [
 
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-// [ { variables: ['row:col', 'row:col', ...], sum: number } ]
+const isEmptySquare = (row, col) => (
+  row >= 0 && row < 10 &&
+  col >= 0 && col < 10 &&
+  GRID_SHAPE[row][col] === '.'
+)
+
 const findAcrossRuns = () => {
-  return []
+  return ACROSS_CLUES.map(([row, col, sum]) => {
+    const variables = []
+    for (; ;) {
+      col += 1
+      if (!isEmptySquare(row, col)) break
+      variables.push(makeVariable(row, col))
+    }
+    return { variables, sum }
+  })
 }
 
-// [ { variables: ['row:col', 'row:col', ...], sum: number } ]
 const findDownRuns = () => {
-  return []
+  return DOWN_CLUES.map(([row, col, sum]) => {
+    const variables = []
+    for (; ;) {
+      row += 1
+      if (!isEmptySquare(row, col)) break
+      variables.push(makeVariable(row, col))
+    }
+    return { variables, sum }
+  })
 }
 
 const main = () => {
   const acrossRuns = findAcrossRuns()
   const downRuns = findDownRuns()
-  const variables = Array.from(new Set(acrossRuns.concat[downRuns].flatMap(({ variables }) => variables)))
+  const allRuns = [].concat(acrossRuns, downRuns)
+  const variables = Array.from(new Set(allRuns.flatMap(({ variables }) => variables)))
   const domains = new Map(variables.map(variable => [variable, DIGITS]))
   const csp = new CSP(variables, domains)
   const acrossConstraints = acrossRuns.map(({ variables, sum }) => new KakuroConstraint(variables, sum))
