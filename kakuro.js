@@ -14,8 +14,8 @@ class KakuroConstraint extends Constraint {
   satisfied(assignment) {
     const values = this.variables.flatMap(variable =>
       assignment.has(variable) ? [assignment.get(variable)] : [])
-    const set = new Set([values])
-    if (set.size !== values.length) {
+    const set = new Set(values)
+    if (set.size < values.length) {
       return false
     }
     const sumOfValues = sum(values)
@@ -24,7 +24,7 @@ class KakuroConstraint extends Constraint {
         return false
       }
     } else {
-      if (sumOfValues > this.sum) {
+      if (sumOfValues >= this.sum) {
         return false
       }
     }
@@ -56,7 +56,7 @@ const ACROSS_CLUES = [
   [3, 0, 29],
   [3, 5, 24],
   [4, 0, 3],
-  [4, 5, 21],
+  [4, 3, 21],
   [5, 0, 4],
   [5, 3, 17],
   [5, 7, 7],
