@@ -2,6 +2,7 @@ const { Constraint, CSP } = require('./csp')
 const SAMPLE_PUZZLE = require('./The-Daily-Telegraph-4203.json')
 
 const sum = xs => xs.reduce((a, b) => a + b, 0)
+const flatten = xss => [].concat(...xss)
 
 const makeVariable = (row, col) => `${row}:${col}`
 
@@ -65,7 +66,38 @@ const findDownRuns = puzzle => {
   })
 }
 
+const digitsWithout = ds => DIGITS.filter(d => !ds.includes(d))
+
+function* findRunDigits(n, requiredTotal) {
+
+  function* helper(n, useds = [], array = []) {
+    const remainingDigits = digitsWithout(flatten(useds))
+    const used = []
+    useds.push(used)
+    for (const digit of remainingDigits) {
+      array.push(digit)
+      used.push(digit)
+      if (n > 1) {
+        yield* helper(n - 1, useds, array)
+      } else {
+        if (sum(array) === requiredTotal) {
+          yield array.slice()
+        }
+      }
+      array.pop()
+    }
+    useds.pop()
+  }
+
+  yield* helper(n)
+}
+
 const main = puzzle => {
+  // {
+  //   const possibilities = Array.from(findRunDigits(6, 31))
+  //   console.dir(possibilities)
+  // }
+  // return
   const acrossRuns = findAcrossRuns(puzzle)
   const downRuns = findDownRuns(puzzle)
   const allRuns = [].concat(acrossRuns, downRuns)
