@@ -50,7 +50,9 @@ const findAcrossRuns = puzzle => {
       if (!isEmptySquare(puzzle, row, col)) break
       variables.push(makeVariable(row, col))
     }
-    return { variables, sum }
+    const tuples = Array.from(findRunDigits(variables.length, sum))
+    const digits = Array.from(new Set(flatten(tuples))).sort()
+    return { variables, sum, tuples, digits }
   })
 }
 
@@ -62,7 +64,9 @@ const findDownRuns = puzzle => {
       if (!isEmptySquare(puzzle, row, col)) break
       variables.push(makeVariable(row, col))
     }
-    return { variables, sum }
+    const tuples = Array.from(findRunDigits(variables.length, sum))
+    const digits = Array.from(new Set(flatten(tuples))).sort()
+    return { variables, sum, tuples, digits }
   })
 }
 
@@ -93,13 +97,10 @@ function* findRunDigits(n, requiredTotal) {
 }
 
 const main = puzzle => {
-  // {
-  //   const possibilities = Array.from(findRunDigits(6, 31))
-  //   console.dir(possibilities)
-  // }
-  // return
   const acrossRuns = findAcrossRuns(puzzle)
+  console.dir(acrossRuns, { depth: null })
   const downRuns = findDownRuns(puzzle)
+  console.dir(downRuns, { depth: null })
   const allRuns = [].concat(acrossRuns, downRuns)
   const variables = Array.from(new Set(allRuns.flatMap(({ variables }) => variables)))
   const domains = new Map(variables.map(variable => [variable, DIGITS]))
