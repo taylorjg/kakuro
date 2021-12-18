@@ -42,33 +42,23 @@ const isEmptySquare = (puzzle, row, col) => (
   puzzle.gridShape[row][col] === '.'
 )
 
-const findAcrossRuns = puzzle => {
-  return puzzle.acrossClues.map(([row, col, sum]) => {
+const findRuns = (puzzle, clues, rowIncrement, colIncrement) => {
+  return clues.map(([row, col, sum]) => {
     const variables = []
     for (; ;) {
-      col += 1
+      row += rowIncrement
+      col += colIncrement
       if (!isEmptySquare(puzzle, row, col)) break
       variables.push(makeVariable(row, col))
     }
     const tuples = Array.from(findRunDigits(variables.length, sum))
-    const digits = Array.from(new Set(flatten(tuples))).sort()
+    const digits = Array.from(new Set(flatten(tuples))).sort((a, b) => a - b)
     return { variables, sum, tuples, digits }
   })
 }
 
-const findDownRuns = puzzle => {
-  return puzzle.downClues.map(([row, col, sum]) => {
-    const variables = []
-    for (; ;) {
-      row += 1
-      if (!isEmptySquare(puzzle, row, col)) break
-      variables.push(makeVariable(row, col))
-    }
-    const tuples = Array.from(findRunDigits(variables.length, sum))
-    const digits = Array.from(new Set(flatten(tuples))).sort()
-    return { variables, sum, tuples, digits }
-  })
-}
+const findAcrossRuns = puzzle => findRuns(puzzle, puzzle.acrossClues, 0, 1)
+const findDownRuns = puzzle => findRuns(puzzle, puzzle.downClues, 1, 0)
 
 const digitsWithout = ds => DIGITS.filter(d => !ds.includes(d))
 
@@ -96,14 +86,18 @@ function* findRunDigits(n, requiredTotal) {
   yield* helper(n)
 }
 
+const makeDomain = (variable, allRuns) => {
+  const runs = allRuns.filter(run => run.variables.includes(variable))
+  const digits = Array.from(new Set(runs.flatMap(run => run.digits)))
+  return digits
+}
+
 const main = puzzle => {
   const acrossRuns = findAcrossRuns(puzzle)
-  console.dir(acrossRuns, { depth: null })
   const downRuns = findDownRuns(puzzle)
-  console.dir(downRuns, { depth: null })
-  const allRuns = [].concat(acrossRuns, downRuns)
+  const allRuns = flatten([acrossRuns, downRuns])
   const variables = Array.from(new Set(allRuns.flatMap(({ variables }) => variables)))
-  const domains = new Map(variables.map(variable => [variable, DIGITS]))
+  const domains = new Map(variables.map(variable => [variable, makeDomain(variable, allRuns)]))
   const csp = new CSP(variables, domains)
   const acrossConstraints = acrossRuns.map(({ variables, sum }) => new KakuroConstraint(variables, sum))
   for (const constraint of acrossConstraints) {
